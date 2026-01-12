@@ -1,27 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaSearch, FaBell, FaBars, FaTimes } from 'react-icons/fa';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
-
-  // Check if user is logged in (in a real app, this would check localStorage/JWT)
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-      // In a real app, you would decode the JWT to get user info
-      setUserRole('traveler'); // Placeholder
-    }
-  }, []);
+  const { currentUser, currentRole, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    setUserRole(null);
+    logout();
     navigate('/');
   };
 
@@ -47,7 +35,7 @@ const Navbar = () => {
             Trip Planner
           </Link>
           
-          {isLoggedIn ? (
+          {currentUser ? (
             <>
               <Link to="/dashboard" className="nav-link">
                 Dashboard
@@ -69,12 +57,12 @@ const Navbar = () => {
         </div>
         
         <div className="nav-right">
-          {isLoggedIn && (
+          {currentUser && (
             <>
               <Link to="/notifications" className="nav-icon">
                 <FaBell />
               </Link>
-              <Link to="/profile" className="nav-icon">
+              <Link to={`/profile/${currentUser.id}`} className="nav-icon">
                 <FaUser />
               </Link>
             </>
@@ -100,7 +88,7 @@ const Navbar = () => {
               Trip Planner
             </Link>
             
-            {isLoggedIn ? (
+            {currentUser ? (
               <>
                 <Link to="/dashboard" className="mobile-nav-link" onClick={toggleMobileMenu}>
                   Dashboard
